@@ -10,7 +10,7 @@ public class JobLoader extends Thread {
 
     @Override
     public void run() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\walee\\eclipse-workspace\\cpu-scheduler-simulator\\src\\Scheduler\\job.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("job.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
