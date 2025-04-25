@@ -1,12 +1,12 @@
 package Scheduler;
+
 import SchedulingAlgorithms.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 public class Main {
-    public static void main(String[] args) throws InterruptedException {
-        BlockingQueue<PCB> jobQueue = new LinkedBlockingQueue<>();
-        BlockingQueue<PCB> readyQueue = new LinkedBlockingQueue<>();
+	public static void main(String[] args) throws InterruptedException {
+        Queue<PCB> jobQueue = new LinkedList<>();
+        Queue<PCB> readyQueue = new LinkedList<>();
         MemoryManager memoryManager = new MemoryManager();
 
         JobLoader loader = new JobLoader(jobQueue);
@@ -15,30 +15,30 @@ public class Main {
         Thread readyLoader = new Thread(() -> {
             while (true) {
                 try {
-                    PCB job = jobQueue.take();
-                    if (memoryManager.allocateMemory(job.memoryRequired)) {
+                    // Take jobs from the jobQueue and add them to readyQueue if memory is available
+                    PCB job = jobQueue.poll();
+                    if (job != null && memoryManager.allocateMemory(job.memoryRequired)) {
                         job.state = "READY";
-                        readyQueue.put(job);
-                    } else {
-                        jobQueue.put(job);
-                        Thread.sleep(100);
+                        readyQueue.offer(job);
                     }
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     break;
                 }
             }
         });
         readyLoader.start();
+    
+        Thread.sleep(2000); // Wait for jobs to populate
+        
+        List<PCB> jobs = new ArrayList<>();
+        while (!readyQueue.isEmpty()) {
+            jobs.add(readyQueue.poll());  // Poll jobs from readyQueue and add to List
+        }
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose Scheduling Algorithm:\n1. FCFS\n2. Round Robin\n3. Priority");
         int choice = scanner.nextInt();
         scanner.close();
-
-        Thread.sleep(2000); // Allow queues to populate
-
-        List<PCB> jobs = new ArrayList<>();
-        readyQueue.drainTo(jobs);
 
         switch (choice) {
             case 1:
