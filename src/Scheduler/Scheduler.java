@@ -11,10 +11,12 @@ public class Scheduler {
     public void runFCFS() {
         int currentTime = 0;
         for (PCB job : jobs) {
+            SystemCalls.createProcess(job);
             job.waitingTime = currentTime;
             currentTime += job.burstTime;
             job.turnaroundTime = currentTime;
             job.state = "TERMINATED";
+            SystemCalls.terminateProcess(job);
             System.out.printf("Job %d completed. Waiting: %d ms, Turnaround: %d ms\n",
                 job.id, job.waitingTime, job.turnaroundTime);
         }
@@ -26,6 +28,7 @@ public class Scheduler {
         Queue<PCB> queue = new LinkedList<>(jobs);
         Map<Integer, Integer> remainingTime = new HashMap<>();
         for (PCB job : jobs) {
+            SystemCalls.createProcess(job);
             remainingTime.put(job.id, job.burstTime);
         }
 
@@ -42,6 +45,7 @@ public class Scheduler {
                 job.turnaroundTime = time;
                 job.waitingTime = time - job.burstTime;
                 job.state = "TERMINATED";
+                SystemCalls.terminateProcess(job);
                 System.out.printf("Job %d completed. Waiting: %d ms, Turnaround: %d ms\n",
                     job.id, job.waitingTime, job.turnaroundTime);
             }
@@ -53,6 +57,7 @@ public class Scheduler {
         jobs.sort((a, b) -> b.priority - a.priority);
 
         for (PCB job : jobs) {
+            SystemCalls.createProcess(job);
             if (time > job.priority * 10) {
                 System.out.printf("Starvation detected for Job %d. Boosting priority.\n", job.id);
             }
@@ -60,6 +65,7 @@ public class Scheduler {
             time += job.burstTime;
             job.turnaroundTime = time;
             job.state = "TERMINATED";
+            SystemCalls.terminateProcess(job);
             System.out.printf("Job %d completed. Waiting: %d ms, Turnaround: %d ms\n",
                 job.id, job.waitingTime, job.turnaroundTime);
         }
