@@ -1,10 +1,10 @@
 package Scheduler;
-import java.util.concurrent.*;
+import java.util.Queue;
 import java.io.*;
 public class JobLoader extends Thread {
-    private BlockingQueue<PCB> jobQueue;
+    private Queue<PCB> jobQueue;
 
-    public JobLoader(BlockingQueue<PCB> jobQueue) {
+    public JobLoader(Queue<PCB> jobQueue) {
         this.jobQueue = jobQueue;
     }
 
@@ -19,9 +19,9 @@ public class JobLoader extends Thread {
                 int burst = Integer.parseInt(parts[1]);
                 int priority = Integer.parseInt(parts[2]);
                 int memory = Integer.parseInt(parts[3]);
-                jobQueue.put(new PCB(id, burst, priority, memory));
+                jobQueue.add(new PCB(id, burst, priority, memory));
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
